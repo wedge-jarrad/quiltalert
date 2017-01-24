@@ -65,13 +65,14 @@ for r in rows:
                     sale_price, discount * 100))
 
 # send email
-msg = MIMEText('\n'.join(sale_message))
-msg['Subject'] = 'Quilt Alert'
-msg['From'] = smtp_from
-msg['To'] = smtp_to
+if sale_message:
+    msg = MIMEText('\n'.join(sale_message))
+    msg['Subject'] = 'Quilt Alert'
+    msg['From'] = smtp_from
+    msg['To'] = smtp_to
 
-if not smtp_port:
-    smtp_port = 25
-s = smtplib.SMTP(smtp_host, smtp_port)
-s.sendmail(smtp_from, smtp_to, msg.as_string())
-s.quit()
+    if not smtp_port:
+        smtp_port = 25
+    s = smtplib.SMTP(smtp_host, smtp_port)
+    s.sendmail(smtp_from, smtp_to, msg.as_string())
+    s.quit()
