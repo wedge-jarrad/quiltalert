@@ -65,7 +65,7 @@ for r in rows:
                     sale_price, discount * 100))
 
 # send email
-msg = MIMEText(sale_message.join('\n'))
+msg = MIMEText('\n'.join(sale_message))
 msg['Subject'] = 'Quilt Alert'
 msg['From'] = smtp_from
 msg['To'] = smtp_to
