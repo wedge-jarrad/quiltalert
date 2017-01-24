@@ -1,0 +1,78 @@
+#!/usr/bin/env python
+import mechanize
+from bs4 import BeautifulSoup
+import smtplib
+from email.mime.text import MIMEText
+
+# Site Credentials
+username = 
+password = 
+# SMTP Settings
+smtp_host =
+smtp_port =
+smtp_from =
+smtp_to = []
+
+# Site URL and paths
+baseurl = "https://www.fatquartershop.com/"
+loginpage = "customer/account/login/"
+wishlist = "wishlist/"
+
+# Login form
+login_form_id = "login-form"
+login_form_username = "login[username]"
+login_form_password = "login[password]"
+
+# Log in to site
+browser = mechanize.Browser()
+browser.open(baseurl + loginpage)
+#browser.select_form(name = login_form_id)
+browser.select_form(nr = 1)
+browser.form[login_form_username] = username
+browser.form[login_form_password] = password
+browser.submit()
+
+# View wishlist page
+browser.open(baseurl + wishlist)
+soup = BeautifulSoup(browser.response().read(), 'html.parser')
+
+# Each table row in wishlist table contains one item
+rows = soup.find('table', id='wishlist-table').find('tbody').find_all('tr')
+
+sale_message = []
+
+def get_price(e):
+    return e.find('span', class_='price').contents[0].strip().lstrip('$')
+
+for r in rows:
+    prod_name_h2 = r.find('h2', class_='product-name')
+    prod_anchor = prod_name_h2.find('a')
+    prod_name_list = prod_anchor.contents
+    if not prod_name_list:
+        continue
+    prod_name = prod_name_list[0].strip()
+    special_price_span = r.find('span', class_='special-price')
+    # if there is a special price then it is on sale
+    if special_price_span:
+        sale_price = get_price(special_price_span)
+        regular_price = get_price(r.find('p', class_='old-price'))
+        discount = 1 - float(sale_price) / float(regular_price)
+        # if discount is beyond threshhold
+        if discount > .1:
+            link = prod_anchor['href']
+            sale_message.append('%s is on sale for $%s (%.0f%% off).' % (link,
+                    sale_price, discount * 100))
+
+print '\n'.join(sale_message)
+
+# send email
+msg = MIMEText(sale_message.join('\n'))
+msg['Subject'] = 'Quilt Alert'
+msg['From'] = smtp_from
+msg['To'] = smtp_to
+
+if not smtp_port:
+    smtp_port = 25
+s = smtplib.SMTP(smtp_host, smtp_port)
+s.sendmail(smtp_from, smtp_to, msg.as_string())
+s.quit()
