@@ -5,13 +5,13 @@ import smtplib
 from email.mime.text import MIMEText
 
 # Site Credentials
-username = 
-password = 
+username = ''
+password = ''
 # SMTP Settings
-smtp_host =
-smtp_port =
-smtp_from =
-smtp_to = []
+smtp_host = ''
+smtp_port = ''
+smtp_from = ''
+smtp_to = ''
 
 # Site URL and paths
 baseurl = "https://www.fatquartershop.com/"
