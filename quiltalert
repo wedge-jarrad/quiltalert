@@ -63,8 +63,6 @@ for r in rows:
             sale_message.append('%s is on sale for $%s (%.0f%% off).' % (link,
                     sale_price, discount * 100))
 
-print '\n'.join(sale_message)
-
 # send email
 msg = MIMEText(sale_message.join('\n'))
 msg['Subject'] = 'Quilt Alert'
