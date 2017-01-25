@@ -12,6 +12,10 @@ smtp_host = ''
 smtp_port = ''
 smtp_from = ''
 smtp_to = ''
+smtp_tls = True
+# Set these if your mail gateway requires authentication
+smtp_username = ''
+smtp_password = ''
 
 # Site URL and paths
 baseurl = "https://www.fatquartershop.com/"
@@ -74,5 +78,10 @@ if sale_message:
     if not smtp_port:
         smtp_port = 25
     s = smtplib.SMTP(smtp_host, smtp_port)
+    s.ehlo()
+    if smtp_tls:
+        s.starttls()
+    if smtp_username and smtp_password:
+        s.login()
     s.sendmail(smtp_from, smtp_to, msg.as_string())
     s.quit()
